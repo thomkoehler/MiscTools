@@ -1,0 +1,27 @@
+name: misc-tools
+version: 1.0.1
+cabal-version: >=1.2
+build-type: Simple
+license: AllRightsReserved
+license-file: ""
+description:  
+author: Thomas Koehler
+data-dir: ""
+ 
+library
+    build-depends: QuickCheck -any, base -any, binary -any,
+                   directory -any, filepath -any, regex-posix -any,
+                   template-haskell -any
+    exposed-modules: Data.Enum.TH Data.Tools System.Filesystem
+    exposed: True
+    buildable: True
+    hs-source-dirs: src
+ 
+test-suite test-MiscTools
+    build-depends: QuickCheck -any, base -any, binary -any,
+                   directory -any, filepath -any, regex-posix -any,
+                   template-haskell -any
+    type: exitcode-stdio-1.0
+    main-is: Main.hs
+    buildable: True
+    hs-source-dirs: src
