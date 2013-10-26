@@ -1,5 +1,5 @@
 name: misc-tools
-version: 1.0.1
+version: 1.0.2
 cabal-version: >=1.2
 build-type: Simple
 license: AllRightsReserved
@@ -11,7 +11,7 @@ data-dir: ""
 library
     build-depends: QuickCheck -any, base -any, binary -any,
                    directory -any, filepath -any, regex-posix -any,
-                   template-haskell -any
+                   template-haskell -any, bytestring -any, resourcet -any, transformers -any, stringsearch -any
     exposed-modules: Data.Enum.TH Data.Tools System.Filesystem
     exposed: True
     buildable: True
@@ -20,7 +20,7 @@ library
 test-suite test-MiscTools
     build-depends: QuickCheck -any, base -any, binary -any,
                    directory -any, filepath -any, regex-posix -any,
-                   template-haskell -any
+                   template-haskell -any, bytestring -any, resourcet -any, transformers -any, stringsearch -any
     type: exitcode-stdio-1.0
     main-is: Main.hs
     buildable: True
