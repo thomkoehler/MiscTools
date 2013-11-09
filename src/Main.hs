@@ -1,32 +1,23 @@
 -----------------------------------------------------------------------------------------------------------------------
 
+{-# OPTIONS_GHC -F -pgmF htfpp #-}
+
 module Main
 (
    main
 )
 where
 
------------------------------------------------------------------------------------------------------------------------
-
-import System.Exit (exitFailure)
-import Control.Monad (unless)
-import GHC.List(and)
-
-import qualified Test.Data.Enum
+import Test.Framework
 
 -----------------------------------------------------------------------------------------------------------------------
 
-allTests =
-   [
-      Test.Data.Enum.checkAll
-   ]
+import {-@ HTF_TESTS @-} Test.Data.Enum
+import {-@ HTF_TESTS @-} Test.System.Filesystem
 
-main = do
-   success <- sequenceAnd allTests
-   unless success exitFailure
-   where
-      sequenceAnd actions = do
-         rs <- sequence actions
-         return $ and rs
+-----------------------------------------------------------------------------------------------------------------------
+
+main :: IO ()
+main = htfMain htf_importedTests
 
 -----------------------------------------------------------------------------------------------------------------------

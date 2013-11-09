@@ -16,12 +16,14 @@ library
     exposed: True
     buildable: True
     hs-source-dirs: src
+    other-modules: Test.System.Filesystem
  
 test-suite test-MiscTools
-    build-depends: QuickCheck -any, base -any, binary -any,
+    build-depends: base -any, binary -any, HUnit >= 1.2 && < 2, HTF, temporary,
                    directory -any, filepath -any, regex-posix -any,
                    template-haskell -any, bytestring -any, resourcet -any, transformers -any, stringsearch -any
     type: exitcode-stdio-1.0
     main-is: Main.hs
     buildable: True
     hs-source-dirs: src
+    other-modules: Test.System.Filesystem
