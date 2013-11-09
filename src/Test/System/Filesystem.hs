@@ -9,19 +9,34 @@ import Test.Framework
 import System.Filesystem(textFindInFile)
 import System.IO.Temp(withTempFile)
 import System.IO(hPutStr, hClose)
+import Data.ByteString.Char8(pack)
+import Control.Monad(forM_)
 
 ------------------------------------------------------------------------------------------------------------------------
 
-test_FindFile = do
-   res <- testFindFile "Hallo"   
-   assertEqual res True
+testDefs = 
+   [
+      ("Hallo", "Hallo", True),
+      (" Hallo", "Hallo", True),
+      ("  Hallo", "Hallo", True),
+      ("   Hallo", "Hallo", True),
+      ("    Hallo", "Hallo", True),
+      ("     Hallo", "Hallo", True),
+      ("      Hallo", "Hallo", True),
+      ("       Hallo", "Hallo", True),
+      ("        Hallo", "Hallo", True),
+      ("         Hallo", "Hallo", True)
+   ]
+
+test_FindFile = forM_ testDefs testFindFile
 
 
-testFindFile :: String -> IO Bool
-testFindFile str = withTempFile "." "testFindFile.txt" $ \_ hFile -> do
-   hPutStr hFile str
+testFindFile :: (String, String, Bool) -> IO ()
+testFindFile (content, findStr, mustFound) = withTempFile "." "testFindFile.txt" $ \fileName hFile -> do
+   hPutStr hFile content
    hClose hFile
-   return True
+   found <- textFindInFile (pack findStr) 1024 fileName
+   assertEqual mustFound found
 
 
 ------------------------------------------------------------------------------------------------------------------------
