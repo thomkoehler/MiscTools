@@ -16,26 +16,31 @@ import Control.Monad(forM_)
 
 testDefs = 
    [
-      ("Hallo", "Hallo", True),
-      (" Hallo", "Hallo", True),
-      ("  Hallo", "Hallo", True),
-      ("   Hallo", "Hallo", True),
-      ("    Hallo", "Hallo", True),
-      ("     Hallo", "Hallo", True),
-      ("      Hallo", "Hallo", True),
-      ("       Hallo", "Hallo", True),
-      ("        Hallo", "Hallo", True),
-      ("         Hallo", "Hallo", True)
+      ("ab", "ab", True, 2),
+      (" ab", "ab", True, 2),
+      ("  ab", "ab", True, 2),
+      ("   ab", "ab", True, 2),
+      ("    ab", "ab", True, 2),
+      ("     ab", "ab", True, 2),
+      ("      ab", "ab", True, 2),
+      ("       ab", "ab", True, 2),
+      ("        ab", "ab", True, 2),
+      ("         ab", "ab", True, 2),
+      (" Hallo ", "Hallo", True, 1024),
+      (" Hxllo ", "Hallo", False, 1024),
+      (" Haxlo ", "Hallo", False, 1024),
+      (" Halxo ", "Hallo", False, 1024),
+      (" Hallx ", "Hallo", False, 1024)
    ]
 
 test_FindFile = forM_ testDefs testFindFile
 
 
-testFindFile :: (String, String, Bool) -> IO ()
-testFindFile (content, findStr, mustFound) = withTempFile "." "testFindFile.txt" $ \fileName hFile -> do
+testFindFile :: (String, String, Bool, Int) -> IO ()
+testFindFile (content, findStr, mustFound, bufferSize) = withTempFile "." "testFindFile.txt" $ \fileName hFile -> do
    hPutStr hFile content
    hClose hFile
-   found <- textFindInFile (pack findStr) 1024 fileName
+   found <- textFindInFile (pack findStr) bufferSize fileName
    assertEqual mustFound found
 
 
