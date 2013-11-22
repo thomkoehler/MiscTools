@@ -13,7 +13,7 @@ import Control.Monad.Trans.Resource(runResourceT, allocate, release)
 import Control.Monad.Trans.Class(lift)
 import Data.ByteString.Search(breakOn)
 import System.Directory(getDirectoryContents, doesDirectoryExist)
-import System.FilePath((</>), takeFileName)
+import System.FilePath((</>))
 import Control.Monad(forM)
 import System.IO(openFile, hClose, IOMode(ReadMode), hIsEOF, hSeek, SeekMode(RelativeSeek))
 

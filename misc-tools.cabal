@@ -1,29 +1,54 @@
+
 name: misc-tools
 version: 1.0.2
 cabal-version: >=1.2
 build-type: Simple
-license: AllRightsReserved
-license-file: ""
+license: GPL-2
+license-file: "LICENSE"
 description:  
 author: Thomas Koehler
 data-dir: ""
  
 library
-    build-depends: QuickCheck -any, base -any, binary -any,
-                   directory -any, filepath -any, regex-posix -any,
-                   template-haskell -any, bytestring -any, resourcet -any, transformers -any, stringsearch -any
-    exposed-modules: Data.Enum.TH Data.Tools System.Filesystem
+    build-depends: 
+      base -any, 
+      binary -any,
+      directory -any, 
+      filepath -any, 
+      regex-posix -any,
+      template-haskell -any, 
+      bytestring -any, 
+      resourcet -any, 
+      transformers -any, 
+      stringsearch -any
+
+    exposed-modules: 
+      Data.Enum.TH 
+      Data.Tools 
+      System.Filesystem
+
     exposed: True
     buildable: True
     hs-source-dirs: src
-    other-modules: Test.System.Filesystem
+    ghc-options: -Wall -rtsopts -O2
  
 test-suite test-MiscTools
-    build-depends: base -any, binary -any, HUnit >= 1.2 && < 2, HTF, temporary,
-                   directory -any, filepath -any, regex-posix -any,
-                   template-haskell -any, bytestring -any, resourcet -any, transformers -any, stringsearch -any
+    build-depends: 
+      base -any, 
+      binary -any, 
+      HUnit >= 1.2 && < 2, 
+      HTF, temporary,
+      directory -any, 
+      filepath -any, 
+      regex-posix -any,
+      template-haskell -any, 
+      bytestring -any, 
+      resourcet -any, 
+      transformers -any, 
+      stringsearch -any
+
     type: exitcode-stdio-1.0
     main-is: Main.hs
     buildable: True
     hs-source-dirs: src
-    other-modules: Test.System.Filesystem
+    ghc-options: -Wall -rtsopts -O2
