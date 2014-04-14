@@ -200,8 +200,7 @@ compDirs recursive sDir dDir iterFun = do
                isDir <- doesDirectoryExist fullName
                
                case (isFile, isDir) of
-                  (True, False) -> do
-                     iterFun $ if isSrc then SrcFileResult fullName else DestFileResult fullName
+                  (True, False) -> iterFun $ if isSrc then SrcFileResult fullName else DestFileResult fullName
                      
                   (False, True) -> do
                      iterFun $ if isSrc then SrcDirResult fullName else DestDirResult fullName
