@@ -20,17 +20,21 @@ library
       bytestring -any, 
       resourcet -any, 
       transformers -any, 
-      stringsearch -any
+      stringsearch -any,
+      indents -any,
+      parsec -any,
+      mtl -any
 
     exposed-modules: 
       Data.Enum.TH 
       Data.Tools 
       System.Filesystem
+      Data.RecordModel.Parser
 
     exposed: True
     buildable: True
     hs-source-dirs: src
-    ghc-options: -Wall -rtsopts -O2
+    ghc-options: -Wall -O2
  
 test-suite test-MiscTools
     build-depends: 
@@ -51,4 +55,4 @@ test-suite test-MiscTools
     main-is: Main.hs
     buildable: True
     hs-source-dirs: src
-    ghc-options: -Wall -rtsopts -O2
+    ghc-options: -Wall -O2

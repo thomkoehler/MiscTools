@@ -20,7 +20,6 @@ enumADT typeNameS elems = do
   return [dataDecl, enumInstance]
   where
       toEnumClauses (name, value) = Clause [LitP (IntegerL value)] (NormalB (ConE (mkName name))) []
-      fromEnumClauses (name, value) = Clause [ConP (mkName name) []] (NormalB (LitE (IntegerL value))) []
 
 
 enumADTDef :: String -> String -> [(String, Integer)] -> Q [Dec]
@@ -34,7 +33,6 @@ enumADTDef typeNameS defFunctionS elems = do
   return [dataDecl, enumInstance]
   where
       toEnumClauses (name, value) = Clause [LitP (IntegerL value)] (NormalB (ConE (mkName name))) []
-      fromEnumClauses (name, value) = Clause [ConP (mkName name) []] (NormalB (LitE (IntegerL value))) []
 
       
 fromEnumMethods :: [(String, Integer)] -> Dec
