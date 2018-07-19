@@ -29,7 +29,11 @@ library
       Data.Enum.TH 
       Data.Tools 
       System.Filesystem
+      Data.RecordModel.QQ
+
+    other-modules: 
       Data.RecordModel.Parser
+      Data.RecordModel.Model
 
     exposed: True
     buildable: True
@@ -50,6 +54,17 @@ test-suite test-MiscTools
       resourcet -any, 
       transformers -any, 
       stringsearch -any
+
+    other-modules: 
+      Test.Data.Enum
+      Test.Data.RecordModel
+      Test.System.Filesystem
+
+      Data.Enum.TH
+      Data.RecordModel.Model
+      Data.RecordModel.Parser
+      Data.RecordModel.QQ
+      System.Filesystem
 
     type: exitcode-stdio-1.0
     main-is: Main.hs

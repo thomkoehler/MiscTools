@@ -1,37 +1,38 @@
 
-{-# LANGUAGE TemplateHaskell #-}
+module Data.RecordModel.Parser(parse) where
 
-module Data.RecordModel.Parser where
-
+import Control.Applicative((<$>), (<*>))
+import Data.Functor.Identity
 import Language.Haskell.TH
-import Text.Parsec
-import qualified Text.Parsec.Token as P
+import Text.Parsec hiding(State, parse)
 import Text.Parsec.Language
-import Text.ParserCombinators.Parsec.Char
-import Control.Applicative(pure, (<*>))
+import Text.Parsec.Indent
+import qualified Text.Parsec.Token as P
+
+import Data.RecordModel.Model
 
 
-type Parser = ParsecT String () (State SourcePos)
+type Parser a = IndentParser String () a
 
 
-languageDef :: GenLanguageDef String () (State SourcePos)
-languageDef = P.LanguageDef
+languageDef :: GenLanguageDef String () (IndentT Identity)
+languageDef = emptyDef
    {
-      P.commentStart = "/*",
-      P.commentEnd = "*/",
-      P.commentLine  = "//",
+      P.commentStart = "{-",
+      P.commentEnd = "-}",
+      P.commentLine  = "--",
       P.nestedComments = True,
       P.identStart  = letter,
       P.identLetter = alphaNum <|> oneOf "_'",
-      P.reservedNames = ["String"],
+      P.reservedNames = [],
       P.opStart = P.opLetter languageDef,
       P.opLetter = oneOf ":!#$%&*+./<=>?@\\^|-~",
       P.reservedOpNames = [],
       P.caseSensitive  = True
    }
 
-
-lexer :: P.GenTokenParser String () (State SourcePos)
+   
+lexer :: P.GenTokenParser String () (IndentT Identity)
 lexer = P.makeTokenParser languageDef
 
 
@@ -43,26 +44,33 @@ identifier :: Parser String
 identifier = P.identifier lexer
 
 
-data Field = Field
-  {
-    fieldName :: !String,
-    fieldType :: Type
-  }
+
+parseModels :: Parser [Model]
+parseModels = many1 parseModel
 
 
-data Model = Model
-  {
-    modelName :: !String,
-    modelFields :: [Field]
-  }
+parseModel :: Parser Model
+parseModel = do
+  spaces
+  name <- identifier
+  fields <- block parseField
+  return $ Model name fields
 
 
 parseType :: Parser Type
-parseType = choice 
-  [
-    reserved "String" >> return (ConT ''String)
-  ]
+parseType = do
+  spaces
+  name <- identifier
+  return $ ConT $ mkName name
 
 
 parseField :: Parser Field
-parseField = pure Field <*> identifier <*> parseType
+parseField = do
+  spaces
+  Field <$> identifier <*> parseType
+
+
+parse :: SourceName -> String -> [Model]
+parse sourceName input = case runIndentParser parseModels () sourceName input of
+  Left err -> error $ show err
+  Right ms -> ms
