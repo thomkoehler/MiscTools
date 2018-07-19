@@ -19,7 +19,6 @@ prop_testModel :: Bool
 prop_testModel =
   let
     tm = TestModel 1 "Hello"
-    (TestModel x y) = tm
   in
-    x == 1 && y == "Hello"
+    first tm == 1 && second tm == "Hello"
 

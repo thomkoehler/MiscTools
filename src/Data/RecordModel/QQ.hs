@@ -22,12 +22,14 @@ createDec :: String -> Q [Dec]
 createDec text = 
   let
     models = parse "" text
+    dataDs = map modelToDataD models
   in
-    return $ map modelToDataD models
+    return dataDs
 
 
 modelToDataD :: Model -> Dec
-modelToDataD (Model n fields) = DataD [] (mkName n) [] Nothing [NormalC (mkName n) (map fieldToBangType fields)] []
+modelToDataD (Model n fields) = DataD [] (mkName n) [] Nothing [RecC (mkName n) (map fieldToVarStrictType fields)] []
 
-fieldToBangType :: Field -> BangType
-fieldToBangType (Field n t) = (Bang NoSourceUnpackedness NoSourceStrictness, t)
+
+fieldToVarStrictType :: Field -> VarStrictType
+fieldToVarStrictType (Field n t) = (mkName n , Bang NoSourceUnpackedness NoSourceStrictness, t)

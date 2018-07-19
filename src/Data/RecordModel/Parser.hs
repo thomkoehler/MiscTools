@@ -24,7 +24,7 @@ languageDef = emptyDef
       P.nestedComments = True,
       P.identStart  = letter,
       P.identLetter = alphaNum <|> oneOf "_'",
-      P.reservedNames = [],
+      P.reservedNames = ["deriving"],
       P.opStart = P.opLetter languageDef,
       P.opLetter = oneOf ":!#$%&*+./<=>?@\\^|-~",
       P.reservedOpNames = [],

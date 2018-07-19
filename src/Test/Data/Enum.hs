@@ -64,7 +64,7 @@ prop_toDef2 = toEnum 2 == D1
 prop_fromDef :: Int -> Bool
 prop_fromDef i = case i of
    0 -> fromEnum D0 == 0
-   otherwise -> toEnum i == D1
+   _ -> toEnum i == D1
 
 ------------------------------------------------------------------------------------------------------------------------
 
