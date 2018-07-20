@@ -12,6 +12,7 @@ import Data.RecordModel.QQ
 TestModel
   first Int
   second String
+  deriving Eq Ord Show
 
 |]
 
@@ -19,6 +20,7 @@ prop_testModel :: Bool
 prop_testModel =
   let
     tm = TestModel 1 "Hello"
+    txt = show tm
   in
     first tm == 1 && second tm == "Hello"
 

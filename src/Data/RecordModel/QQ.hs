@@ -28,8 +28,11 @@ createDec text =
 
 
 modelToDataD :: Model -> Dec
-modelToDataD (Model n fields) = DataD [] (mkName n) [] Nothing [RecC (mkName n) (map fieldToVarStrictType fields)] []
+modelToDataD (Model n fields derivs) = DataD [] (mkName n) [] Nothing [RecC (mkName n) (map fieldToVarStrictType fields)] [strToDerivClause derivs]
 
+strToDerivClause :: [String] -> DerivClause
+strToDerivClause names = DerivClause Nothing $ map (ConT . mkName) names
 
 fieldToVarStrictType :: Field -> VarStrictType
 fieldToVarStrictType (Field n t) = (mkName n , Bang NoSourceUnpackedness NoSourceStrictness, t)
+

@@ -13,6 +13,7 @@ data Field = Field
 data Model = Model
   {
     modelName :: !String,
-    modelFields :: [Field]
+    modelFields :: [Field],
+    modelDerivings :: [String]
   }
 

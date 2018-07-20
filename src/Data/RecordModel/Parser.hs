@@ -12,6 +12,11 @@ import qualified Text.Parsec.Token as P
 import Data.RecordModel.Model
 
 
+data ModelAst
+  = FieldAst !String !Type
+  | DerivingAst [String]
+
+
 type Parser a = IndentParser String () a
 
 
@@ -44,7 +49,6 @@ identifier :: Parser String
 identifier = P.identifier lexer
 
 
-
 parseModels :: Parser [Model]
 parseModels = many1 parseModel
 
@@ -52,9 +56,19 @@ parseModels = many1 parseModel
 parseModel :: Parser Model
 parseModel = do
   spaces
-  name <- identifier
-  fields <- block parseField
-  return $ Model name fields
+  withBlock createModel identifier parseModelAst
+  where
+    createModel name modelAsts = 
+      let
+        isFieldAst (FieldAst _ _) = True
+        isFieldAst _ = False
+        isDerivingAst = not . isFieldAst 
+        toField (FieldAst n t) = Field n t
+        toDeriving (DerivingAst ds) = ds
+        fields = map toField . filter isFieldAst $ modelAsts
+        derivings = map toDeriving . filter isDerivingAst $ modelAsts
+      in
+        Model name fields $ concat derivings
 
 
 parseType :: Parser Type
@@ -64,10 +78,25 @@ parseType = do
   return $ ConT $ mkName name
 
 
-parseField :: Parser Field
-parseField = do
+parseModelAst :: Parser ModelAst
+parseModelAst = do
   spaces
-  Field <$> identifier <*> parseType
+  choice 
+    [
+      parseFieldAst,
+      parseDerivingAst      
+    ]
+
+
+parseDerivingAst :: Parser ModelAst
+parseDerivingAst = do
+  reserved "deriving"
+  names <- many1 identifier
+  return $ DerivingAst names
+
+
+parseFieldAst :: Parser ModelAst
+parseFieldAst = FieldAst <$> identifier <*> parseType
 
 
 parse :: SourceName -> String -> [Model]
