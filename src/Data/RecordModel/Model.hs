@@ -6,6 +6,7 @@ import Language.Haskell.TH
 data Field = Field
   {
     fieldName :: !String,
+    fieldJsonName :: !String,
     fieldType :: !Type
   }
 

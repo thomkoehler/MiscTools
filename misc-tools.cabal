@@ -23,7 +23,8 @@ library
       stringsearch -any,
       indents -any,
       parsec -any,
-      mtl -any
+      mtl -any,
+      aeson -any
 
     exposed-modules: 
       Data.Enum.TH 
@@ -53,7 +54,8 @@ test-suite test-MiscTools
       bytestring -any, 
       resourcet -any, 
       transformers -any, 
-      stringsearch -any
+      stringsearch -any,
+      aeson -any
 
     other-modules: 
       Test.Data.Enum

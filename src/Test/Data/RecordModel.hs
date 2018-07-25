@@ -1,11 +1,17 @@
 {-# OPTIONS_GHC -F -pgmF htfpp #-}
-{-# LANGUAGE  QuasiQuotes #-}
-{-# LANGUAGE  ScopedTypeVariables #-}
+{-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE DeriveGeneric #-}
 
 module Test.Data.RecordModel(htf_thisModulesTests) where
 
 import Test.Framework
+import Data.Aeson
+import Data.String
+import GHC.Generics
+
 import Data.RecordModel.QQ
+
 
 [model|
 
@@ -15,6 +21,15 @@ TestModel
   deriving Eq Ord Show
 
 |]
+
+
+-- instance ToJSON TestModel where
+--   toJSON m = object [fromString "first" .= first m, fromString "second" .= second m] 
+
+
+instance FromJSON TestModel where
+  parseJSON  = withObject (fromString "TestModel") $ \v -> TestModel <$> v .: fromString "first" <*> v .: fromString "second"
+
 
 prop_testModel :: Bool
 prop_testModel =

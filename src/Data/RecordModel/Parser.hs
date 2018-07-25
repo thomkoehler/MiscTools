@@ -63,12 +63,12 @@ parseModel = do
         isFieldAst (FieldAst _ _) = True
         isFieldAst _ = False
         isDerivingAst = not . isFieldAst 
-        toField (FieldAst n t) = Field n t
+        toField (FieldAst n t) = Field n n t
         toDeriving (DerivingAst ds) = ds
         fields = map toField . filter isFieldAst $ modelAsts
         derivings = map toDeriving . filter isDerivingAst $ modelAsts
       in
-        Model name fields $ concat derivings
+        Model name fields $ "Generic" : concat derivings
 
 
 parseType :: Parser Type

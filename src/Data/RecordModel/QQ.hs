@@ -23,16 +23,56 @@ createDec text =
   let
     models = parse "" text
     dataDs = map modelToDataD models
+    toJsonInstances = map modelToJSONInstance models
   in
-    return dataDs
+    return $ dataDs ++ toJsonInstances
 
 
 modelToDataD :: Model -> Dec
-modelToDataD (Model n fields derivs) = DataD [] (mkName n) [] Nothing [RecC (mkName n) (map fieldToVarStrictType fields)] [strToDerivClause derivs]
+modelToDataD m = 
+  let
+    name = mkName $ modelName m
+  in
+    DataD [] name [] Nothing [RecC name (map fieldToVarStrictType (modelFields m))] [strToDerivClause (modelDerivings m)]
 
 strToDerivClause :: [String] -> DerivClause
 strToDerivClause names = DerivClause Nothing $ map (ConT . mkName) names
 
 fieldToVarStrictType :: Field -> VarStrictType
-fieldToVarStrictType (Field n t) = (mkName n , Bang NoSourceUnpackedness NoSourceStrictness, t)
+fieldToVarStrictType field = (mkName (fieldName field), Bang NoSourceUnpackedness NoSourceStrictness, fieldType field)
 
+
+modelToJSONInstance :: Model -> Dec
+modelToJSONInstance model = 
+  let
+    toJsonType = ConT $ mkName "ToJSON"
+    modelType = ConT $ mkName $ modelName model
+  in
+    InstanceD Nothing [] (AppT toJsonType modelType) []
+
+
+
+{-
+
+instance ToJSON TestModel where
+  toJSON m = object [fromString "first" .= first m, fromString "second" .= second m] 
+
+
+
+[InstanceD Nothing [] (AppT (ConT Data.Aeson.Types.ToJSON.ToJSON) (ConT RunQ.TestModel)) 
+
+
+[
+  FunD Data.Aeson.Types.ToJSON.toJSON 
+  [
+    Clause 
+      [VarP m_0] 
+      (NormalB 
+        (AppE 
+          (VarE Data.Aeson.Types.Internal.object) 
+          (ListE [InfixE (Just (AppE (VarE Data.String.fromString) (LitE (StringL "first")))) (VarE Data.Aeson.Types.ToJSON..=) (Just (AppE (VarE RunQ.first) (VarE m_0))),InfixE (Just (AppE (VarE Data.String.fromString) (LitE (StringL "second")))) (VarE Data.Aeson.Types.ToJSON..=) (Just (AppE (VarE RunQ.second) (VarE m_0)))]))) []]
+  ]
+]
+
+
+-}
