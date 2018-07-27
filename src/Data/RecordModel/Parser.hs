@@ -64,7 +64,9 @@ parseModel = do
         isFieldAst _ = False
         isDerivingAst = not . isFieldAst 
         toField (FieldAst n t) = Field n n t
+        toField _ = error "FieldAst expected"
         toDeriving (DerivingAst ds) = ds
+        toDeriving _ = error "DerivingAst expected" 
         fields = map toField . filter isFieldAst $ modelAsts
         derivings = map toDeriving . filter isDerivingAst $ modelAsts
       in
@@ -100,6 +102,6 @@ parseFieldAst = FieldAst <$> identifier <*> parseType
 
 
 parse :: SourceName -> String -> [Model]
-parse sourceName input = case runIndentParser parseModels () sourceName input of
+parse sourceName' input = case runIndentParser parseModels () sourceName' input of
   Left err -> error $ show err
   Right ms -> ms

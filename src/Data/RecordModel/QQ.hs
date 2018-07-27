@@ -1,9 +1,13 @@
 
+{-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE TemplateHaskell #-}
+
 module Data.RecordModel.QQ(model) where
 
 import Language.Haskell.TH.Quote
 import Language.Haskell.TH
 import Language.Haskell.TH.Syntax
+import Data.Aeson
 
 import Data.RecordModel.Parser
 import Data.RecordModel.Model
@@ -19,21 +23,23 @@ model = QuasiQuoter
 
 
 createDec :: String -> Q [Dec]
-createDec text = 
-  let
-    models = parse "" text
-    dataDs = map modelToDataD models
-    toJsonInstances = map modelToJSONInstance models
-  in
-    return $ dataDs ++ toJsonInstances
+createDec text = do
+  let models = parse "" text
+  let dataDs = map modelToDataD models
+  toJsonInstances <- mapM modelToJSONInstance models
+  return $ dataDs ++ concat toJsonInstances
 
 
 modelToDataD :: Model -> Dec
 modelToDataD m = 
-  let
-    name = mkName $ modelName m
-  in
-    DataD [] name [] Nothing [RecC name (map fieldToVarStrictType (modelFields m))] [strToDerivClause (modelDerivings m)]
+ let
+   name = mkName $ modelName m
+ in
+   DataD [] name [] Nothing [RecC name (map fieldToVarStrictType (modelFields m))] [strToDerivClause (modelDerivings m)]
+
+
+
+
 
 strToDerivClause :: [String] -> DerivClause
 strToDerivClause names = DerivClause Nothing $ map (ConT . mkName) names
@@ -42,13 +48,28 @@ fieldToVarStrictType :: Field -> VarStrictType
 fieldToVarStrictType field = (mkName (fieldName field), Bang NoSourceUnpackedness NoSourceStrictness, fieldType field)
 
 
-modelToJSONInstance :: Model -> Dec
-modelToJSONInstance model = 
+{-
+
+encodeModel :: Model -> Dec
+encodeModel model =
   let
-    toJsonType = ConT $ mkName "ToJSON"
-    modelType = ConT $ mkName $ modelName model
+    mn = mkName $ modelName model
+    modelValueName = mkName "m"
+    toJsonName = mkName "toJSON"
+    objectName = mkName "object"
+    encodeFields = map (encodeField modelValueName) $ modelFields model
   in
-    InstanceD Nothing [] (AppT toJsonType modelType) []
+    FunD toJsonName [Clause [VarP modelValueName] (NormalB (AppE (VarE objectName) (ListE encodeFields))) []]
+-}
+
+encodeField :: Field -> Q Exp
+encodeField field = [| fromString $(varE (mkName (fieldName field))) .= first m |]
+
+
+modelToJSONInstance :: Model -> Q [Dec]
+modelToJSONInstance model' = do
+  let encodeFields = map encodeField $ modelFields model'
+  [d| instance ToJSON $(conT (mkName (modelName model'))) where toJSON m = object $(listE encodeFields) |]
 
 
 
@@ -70,7 +91,11 @@ instance ToJSON TestModel where
       (NormalB 
         (AppE 
           (VarE Data.Aeson.Types.Internal.object) 
-          (ListE [InfixE (Just (AppE (VarE Data.String.fromString) (LitE (StringL "first")))) (VarE Data.Aeson.Types.ToJSON..=) (Just (AppE (VarE RunQ.first) (VarE m_0))),InfixE (Just (AppE (VarE Data.String.fromString) (LitE (StringL "second")))) (VarE Data.Aeson.Types.ToJSON..=) (Just (AppE (VarE RunQ.second) (VarE m_0)))]))) []]
+          (ListE 
+            [
+              InfixE (Just (AppE (VarE Data.String.fromString) (LitE (StringL "first")))) (VarE Data.Aeson.Types.ToJSON..=) (Just (AppE (VarE RunQ.first) (VarE m_0))),
+              InfixE (Just (AppE (VarE Data.String.fromString) (LitE (StringL "second")))) (VarE Data.Aeson.Types.ToJSON..=) (Just (AppE (VarE RunQ.second) (VarE m_0)))
+            ]))) []]
   ]
 ]
 

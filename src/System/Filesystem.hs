@@ -154,27 +154,27 @@ printCompare res = return $ printResult res
 
 
 compDirs :: Bool -> FilePath -> FilePath -> (Result -> IO ()) -> IO ()
-compDirs recursive sDir dDir iterFun = do
-   isSrcDir <- doesDirectoryExist sDir
-   isSrcFile <- doesFileExist sDir
-   isDestDir <- doesDirectoryExist dDir
-   isDestFile <- doesFileExist dDir    
+compDirs recursive sDir' dDir' iterFun = do
+   isSrcDir <- doesDirectoryExist sDir'
+   isSrcFile <- doesFileExist sDir'
+   isDestDir <- doesDirectoryExist dDir'
+   isDestFile <- doesFileExist dDir'    
    
    case (isSrcDir, isSrcFile, isDestDir, isDestFile) of
       (True, False, True, False)  -> do
-         iterFun $ DirResult sDir dDir  
-         compDirsIter_ recursive sDir dDir iterFun
+         iterFun $ DirResult sDir' dDir'  
+         compDirsIter_ recursive sDir' dDir' iterFun
          
-      (True, False, False, False) -> compOnlyDirIter recursive True sDir iterFun 
-      (False, False, True, False) -> compOnlyDirIter recursive False dDir iterFun
-      (True, False, False, True)  -> iterFun $ SrcDirFileMismatch sDir dDir
-      (False, True, True, False)  -> iterFun $ DestDirFileMismatch dDir sDir
+      (True, False, False, False) -> compOnlyDirIter recursive True sDir' iterFun 
+      (False, False, True, False) -> compOnlyDirIter recursive False dDir' iterFun
+      (True, False, False, True)  -> iterFun $ SrcDirFileMismatch sDir' dDir'
+      (False, True, True, False)  -> iterFun $ DestDirFileMismatch dDir' sDir'
       _ -> error "Fatal error: The files system entry can be either a file or a directory."
       
    where
       
       compDirsIter_ :: Bool -> FilePath -> FilePath -> (Result -> IO ()) -> IO ()
-      compDirsIter_ recursive sDir dDir iterFun = do
+      compDirsIter_ recursive' sDir dDir iterFun' = do
          srcDirConts <- getDirectoryContents sDir
          destDirConts <- getDirectoryContents dDir
          let 
@@ -200,11 +200,11 @@ compDirs recursive sDir dDir iterFun = do
                isDir <- doesDirectoryExist fullName
                
                case (isFile, isDir) of
-                  (True, False) -> iterFun $ if isSrc then SrcFileResult fullName else DestFileResult fullName
+                  (True, False) -> iterFun' $ if isSrc then SrcFileResult fullName else DestFileResult fullName
                      
                   (False, True) -> do
-                     iterFun $ if isSrc then SrcDirResult fullName else DestDirResult fullName
-                     when recursive $ compOnlyDirIter True isSrc fullName iterFun
+                     iterFun' $ if isSrc then SrcDirResult fullName else DestDirResult fullName
+                     when recursive' $ compOnlyDirIter True isSrc fullName iterFun'
 
                   (False, False) -> return ()
                   
@@ -237,7 +237,7 @@ compDirs recursive sDir dDir iterFun = do
       
       
       compOnlyDirIter :: Bool -> Bool -> FilePath -> (Result -> IO ()) -> IO ()
-      compOnlyDirIter recursive isSrc compDir iterFun = do
+      compOnlyDirIter recursive' isSrc compDir iterFun' = do
          dirConts <- getDirectoryContents compDir
          let 
             propFile file = file /= "." && file /= ".."
@@ -250,7 +250,7 @@ compDirs recursive sDir dDir iterFun = do
                   then SrcFileResult file
                   else DestFileResult file
             in
-               iterFun rs
+               iterFun' rs
                 
          dirs <- filterM doesDirectoryExist propDirConts
          
@@ -260,8 +260,8 @@ compDirs recursive sDir dDir iterFun = do
                   then SrcDirResult dir
                   else DestDirResult dir
             in do
-               iterFun rs
-               when recursive $ compOnlyDirIter True isSrc dir iterFun
+               iterFun' rs
+               when recursive' $ compOnlyDirIter True isSrc dir iterFun'
 
 getFileSize :: FilePath -> IO Integer
 getFileSize path = bracket (openFile path ReadMode) hClose hFileSize
