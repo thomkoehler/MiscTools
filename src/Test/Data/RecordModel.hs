@@ -28,7 +28,8 @@ TestModel
 
 
 instance FromJSON TestModel where
-  parseJSON  = withObject (fromString "TestModel") $ \v -> TestModel <$> v .: fromString "first" <*> v .: fromString "second"
+  --parseJSON  = withObject (fromString "TestModel") $ \v -> TestModel <$> v .: fromString "first" <*> v .: fromString "second"
+  parseJSON (Object v) = TestModel <$> v .: fromString "first" <*> v .: fromString "second"
 
 
 prop_testModel :: Bool

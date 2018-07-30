@@ -27,7 +27,8 @@ createDec text = do
   let models = parse "" text
   let dataDs = map modelToDataD models
   toJsonInstances <- mapM modelToJSONInstance models
-  return $ dataDs ++ concat toJsonInstances
+  fromJsonInstances <- mapM modelFromJSONInstance models
+  return $ dataDs ++ concat toJsonInstances ++ concat fromJsonInstances
 
 
 modelToDataD :: Model -> Dec
@@ -38,11 +39,9 @@ modelToDataD m =
    DataD [] name [] Nothing [RecC name (map fieldToVarStrictType (modelFields m))] [strToDerivClause (modelDerivings m)]
 
 
-
-
-
 strToDerivClause :: [String] -> DerivClause
 strToDerivClause names = DerivClause Nothing $ map (ConT . mkName) names
+
 
 fieldToVarStrictType :: Field -> VarStrictType
 fieldToVarStrictType field = (mkName (fieldName field), Bang NoSourceUnpackedness NoSourceStrictness, fieldType field)
@@ -63,7 +62,7 @@ encodeModel model =
 -}
 
 encodeField :: Field -> Q Exp
-encodeField field = [| fromString $(varE (mkName (fieldName field))) .= first m |]
+encodeField field = [| fromString $(stringE (fieldJsonName field)) .= first m |]
 
 
 modelToJSONInstance :: Model -> Q [Dec]
@@ -73,11 +72,21 @@ modelToJSONInstance model' = do
 
 
 
+decodeField :: Field -> Q Exp
+decodeField field = [| fromString $(stringE (fieldJsonName field)) |]
+
+modelFromJSONInstance :: Model -> Q [Dec]
+modelFromJSONInstance model' = [d| instance FromJSON $(conT (mkName (modelName model'))) where parseJSON m = undefined |]
+
+
 {-
 
 instance ToJSON TestModel where
   toJSON m = object [fromString "first" .= first m, fromString "second" .= second m] 
 
+instance FromJSON TestModel where
+  -- parseJSON  = withObject (fromString "TestModel") $ \v -> TestModel <$> v .: fromString "first" <*> v .: fromString "second"
+  parseJSON (Object v) = TestModel <$> v .: fromString "first" <*> v .: fromString "second"
 
 
 [InstanceD Nothing [] (AppT (ConT Data.Aeson.Types.ToJSON.ToJSON) (ConT RunQ.TestModel)) 
