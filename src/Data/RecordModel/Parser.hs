@@ -1,12 +1,11 @@
-
 module Data.RecordModel.Parser(parse) where
 
-import Control.Applicative((<$>), (<*>))
+import Control.Applicative ((<$>), (<*>))
 import Data.Functor.Identity
 import Language.Haskell.TH
-import Text.Parsec hiding(State, parse)
-import Text.Parsec.Language
+import Text.Parsec hiding (State, parse)
 import Text.Parsec.Indent
+import Text.Parsec.Language
 import qualified Text.Parsec.Token as P
 
 import Data.RecordModel.Model
@@ -61,12 +60,12 @@ parseModel = do
     createModel name modelAsts = 
       let
         isFieldAst (FieldAst _ _) = True
-        isFieldAst _ = False
+        isFieldAst _              = False
         isDerivingAst = not . isFieldAst 
         toField (FieldAst n t) = Field n n t
-        toField _ = error "FieldAst expected"
+        toField _              = error "FieldAst expected"
         toDeriving (DerivingAst ds) = ds
-        toDeriving _ = error "DerivingAst expected" 
+        toDeriving _                = error "DerivingAst expected" 
         fields = map toField . filter isFieldAst $ modelAsts
         derivings = map toDeriving . filter isDerivingAst $ modelAsts
       in

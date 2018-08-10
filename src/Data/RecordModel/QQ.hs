@@ -4,13 +4,13 @@
 
 module Data.RecordModel.QQ(model) where
 
-import Language.Haskell.TH.Quote
-import Language.Haskell.TH
-import Language.Haskell.TH.Syntax
 import Data.Aeson
+import Language.Haskell.TH
+import Language.Haskell.TH.Quote
+import Language.Haskell.TH.Syntax
 
-import Data.RecordModel.Parser
 import Data.RecordModel.Model
+import Data.RecordModel.Parser
 
 model :: QuasiQuoter
 model = QuasiQuoter
@@ -45,6 +45,7 @@ strToDerivClause names = DerivClause Nothing $ map (ConT . mkName) names
 
 fieldToVarStrictType :: Field -> VarStrictType
 fieldToVarStrictType field = (mkName (fieldName field), Bang NoSourceUnpackedness NoSourceStrictness, fieldType field)
+
 
 
 {-

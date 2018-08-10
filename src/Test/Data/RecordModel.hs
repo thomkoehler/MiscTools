@@ -1,14 +1,14 @@
 {-# OPTIONS_GHC -F -pgmF htfpp #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 module Test.Data.RecordModel(htf_thisModulesTests) where
 
-import Test.Framework
 import Data.Aeson
 import Data.String
 import GHC.Generics
+import Test.Framework
 
 import Data.RecordModel.QQ
 
